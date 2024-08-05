@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, 
     // Redirect
 } from "react-router-dom";
-import { HomePage } from "./pages/HomePage";
+import { HomePage } from "./pages/HomePage/HomePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { RaceList } from "./pages/RaceList";
 import { RaceDetail } from "./pages/RaceDetail";
