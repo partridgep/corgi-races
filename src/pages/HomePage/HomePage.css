@@ -1,6 +1,4 @@
 .subtitle {
-    /* color: #cd8a24; */
-    /* color: #E69649; */
     color: #c36e1c;
 }
 
@@ -21,7 +19,6 @@
 @keyframes elongate {
     to   { transform: scale(1.5, 1) translate(-12.5%, 0%); }
 }
-
 
 .leftOfLong-animate {
     display: inline-block;
@@ -56,8 +53,21 @@
     100% { transform: translate(0%, 0%) scale(100%); }
    }
 
-@keyframes move-text {
-    0% { bottom: -0.2em; opacity: 2; }
-    50% { bottom: 0.2em; }
-    100% { bottom: 0; opacity: 1; }
-}
+@media (prefers-reduced-motion) {
+    /* styles to apply if a user's device settings are set to reduced motion */
+    .short-animate {
+        animation: none;
+    }
+    .long-animate {
+        animation: none;
+    }
+    .leftOfLong-animate {
+        animation: none;
+    }
+    .rightOfLong-animate {
+        animation: none;
+    }
+    .strong-animate {
+        animation: none;
+    }
+  }

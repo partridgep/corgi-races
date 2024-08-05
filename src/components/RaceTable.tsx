@@ -31,29 +31,34 @@ export const RaceTable = (
     }
 
     return (
-        <div className="border rounded shadow" >
-            <table className="min-w-full divide-y divide-gray-300">
-                <thead>
+        <div className="border dark:border-slate-700 rounded shadow" >
+            <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+                <thead className="dark:bg-gray-700">
                     <tr>
-                        <th scope="col" className="py-3.5 pl-4 px-3 text-left text-sm font-semibold text-gray-900">Date</th>
-                        <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 lg:table-cell">Location</th>
-                        <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">City</th>
-                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">State</th>
-                        <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">Organized by</th>
-                        <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 sm:table-cell">Direct Link</th>
+                        <th scope="col" className="py-3.5 pl-4 px-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Date</th>
+                        <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white lg:table-cell">Location</th>
+                        <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white sm:table-cell">City</th>
+                        <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">State</th>
+                        <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white sm:table-cell">Organized by</th>
+                        <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white sm:table-cell">Direct Link</th>
                     </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-500 bg-white dark:bg-slate-800">
                     { data.map((race: raceKeys) => (
                         <tr key={race.race_id}>
-                            <td className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:w-auto sm:max-w-none">{displayDate(race.datetime)}</td>
-                            <td className="hidden px-3 py-4 text-sm text-gray-900 lg:table-cell">{race.address}</td>
-                            <td className="hidden px-3 py-4 text-sm text-gray-900 lg:table-cell">{race.city}</td>
-                            <td className="px-3 py-4 text-sm text-gray-900">{race.state}</td>
+                            <td className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-white sm:w-auto sm:max-w-none">{displayDate(race.datetime)}</td>
+                            <td className="hidden px-3 py-4 text-sm text-gray-900 dark:text-white lg:table-cell">{race.address}</td>
+                            <td className="hidden px-3 py-4 text-sm text-gray-900 dark:text-white lg:table-cell">{race.city}</td>
+                            <td className="px-3 py-4 text-sm text-gray-900 dark:text-white">{race.state}</td>
                             <td></td>
-                            <td className="hidden px-3 py-4 text-sm text-gray-900 lg:table-cell">
+                            <td className="hidden px-3 py-4 text-sm text-gray-900 dark:text-white lg:table-cell">
                                 {race.info_url &&
-                                    <a href={race.info_url} target="_blank" rel="noreferrer" className='hover:text-gray-500 active:text-gray-600'>
+                                    <a
+                                        href={race.info_url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="hover:text-gray-500 dark:hover:text-gray-300 active:text-gray-600"
+                                    >
                                         <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
                                     </a>
                                 }

@@ -6,8 +6,8 @@ export const HomePage = () => {
     const strongStr = "herding";
 
     return (
-        <div className="w-full">
-            <h1 className="w-full text-8xl font-bold text-center mt-40">Corgi Races</h1>
+        <div className="w-full pb-28">
+            <h1 className="w-full dark:text-white text-8xl font-bold text-center mt-40">Corgi Races</h1>
             <h2 className="w-full subtitle text-5xl text-center mt-12 mb-4"><span className="short-animate">Short</span> nubby legs</h2>
             <h2 className="w-full subtitle text-5xl text-center my-4">
                 <span className="leftOfLong-animate">+ </span>
@@ -38,7 +38,7 @@ export const HomePage = () => {
                     Find nearest corgi race
                 </button>
             </div>
-            <p className="w-full text-center italic mb-4 text-sm">Upcoming races</p>
+            <p className="w-full dark:text-gray-200 text-center italic mb-4 text-sm">Upcoming races</p>
             <div className="px-2 sm:px-4 md:px-20">
                 <RaceTable num={1} startTime={new Date()} asc={true} />
             </div>
