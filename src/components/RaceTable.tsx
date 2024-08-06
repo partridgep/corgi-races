@@ -3,24 +3,40 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 
-type tableProps = { num: number , startTime?: Date, endTime?: Date, asc: boolean }
+type tableProps = { id?: string, num?: number , startTime?: Date, endTime?: Date, asc: boolean }
 type raceKeys = { race_id: string, datetime?: string; address?: string, city?: string, state?: string, info_url?: string }
 
 export const RaceTable = (
-    { num, startTime, endTime, asc }
+    { id, num, startTime, endTime, asc }
     : tableProps
 ) => {
 
     const [data, setData] = useState([]);
 
     useEffect(() => {
+        let query = `/api/races`
+        const queryParams = {
+            id,
+            num,
+            startTime,
+            endTime,
+            asc,
+        }
+        let count = 0
+        for (let [ paramKey, paramVal ] of Object.entries(queryParams)) {
+            if (paramVal !== null && paramVal !== undefined) {
+                if (count === 0) query += `/query?${paramKey}=${paramVal}`
+                else query += `&${paramKey}=${paramVal}`
+                count++
+            }
+        }
         const fetchData = async () => {
-            axios.get('/api/races')
+            axios.get(query)
             .then(res => res.data)
             .then(data => setData(data));
         }
         fetchData()
-    }, []);
+    }, [ asc, endTime, num, startTime ]);
 
     function displayDate(dateStr?: string | null) {
         if (!dateStr) return

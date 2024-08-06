@@ -40,7 +40,7 @@ export const HomePage = () => {
             </div>
             <p className="w-full dark:text-gray-200 text-center italic mb-4 text-sm">Upcoming races</p>
             <div className="px-2 sm:px-4 md:px-20">
-                <RaceTable num={1} startTime={new Date()} asc={true} />
+                <RaceTable num={10} startTime={new Date()} asc={true} />
             </div>
         </div>
     )
