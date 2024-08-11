@@ -1,13 +1,23 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
+import { QueryParams } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 
-type tableProps = { id?: string, num?: number , startTime?: Date, endTime?: Date, asc: boolean }
-type raceKeys = { race_id: string, datetime?: string; address?: string, city?: string, state?: string, info_url?: string }
+type tableProps = {
+    query: QueryParams
+}
+type raceKeys = {
+    race_id: string,
+    datetime?: string;
+    address?: string,
+    city?: string,
+    state?: string,
+    info_url?: string
+}
 
 export const RaceTable = (
-    { id, num, startTime, endTime, asc }
+    { query: { id, num, startTime, endTime, asc } }
     : tableProps
 ) => {
 
@@ -22,6 +32,7 @@ export const RaceTable = (
             endTime,
             asc,
         }
+        // let query = `/api/races?${new URLSearchParams(queryParams as Record<string, string>).toString()}`;
         let count = 0
         for (let [ paramKey, paramVal ] of Object.entries(queryParams)) {
             if (paramVal !== null && paramVal !== undefined) {

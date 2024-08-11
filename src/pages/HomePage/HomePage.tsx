@@ -1,72 +1,16 @@
 import { RaceTable } from "../../components/RaceTable"
-// import React, { useState } from 'react';
-import axios from 'axios';
+import { Link } from "react-router-dom";
 import './HomePage.css';
 
 export const HomePage = () => {
 
     const strongStr = "herding";
 
-    type Coordinates = {
-        latitude: number;
-        longitude: number;
-    }
-
-    if (!navigator.geolocation) {
-        alert("No geolocation available!");
-      }
-
-    const getUserLocation = (): Promise<Coordinates> => {
-        return new Promise((resolve, reject) => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    position => {
-                        const coords: Coordinates = {
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude
-                        };
-                        resolve(coords);
-                    },
-                    error => {
-                        reject(error);
-                    },
-                    {
-                        enableHighAccuracy: true, // Use GPS if available
-                        timeout: 10000, // Wait 10 seconds before timing out
-                        maximumAge: 0 // Do not use a cached position
-                    }
-                );
-            } else {
-                reject(new Error("Geolocation is not supported by this browser."));
-            }
-        });
-    }
-
-    const queryClosestRaces = async () => {
-        let userCoordinates: Coordinates | null = null;
-
-        await getUserLocation().then((coords: Coordinates) => {
-            console.log('User latitude:', coords.latitude);
-            console.log('User longitude:', coords.longitude);
-            userCoordinates = coords;
-            const queryParams = {
-                lat: userCoordinates.latitude.toString(),
-                lon: userCoordinates.longitude.toString(),
-                num: "5",
-                startTime: new Date().toISOString(),
-            }
-            let query = `/api/races?${new URLSearchParams(queryParams as Record<string, string>).toString()}`;
-            console.log(query);
-            axios.get(query)
-            .then(res => res.data)
-            .then(data => {
-                console.log(data);
-            });
-        })
-        .catch(error => {
-            console.error('Error getting user location:', error.message);
-            return;
-        });
+    const linkToClosest = `/races?num=10&startTime=${new Date().toISOString()}&closest=true&asc=true`;
+    const homepageQuery = {
+        num: 10,
+        startTime: new Date(),
+        asc: true
     }
 
     return (
@@ -95,17 +39,16 @@ export const HomePage = () => {
                  energy</h2>
             <h2 className="w-full subtitle text-semibold text-5xl text-center mt-4 mb-16">= a recipe for a hilarious competition</h2>
             <div className="w-full mx-auto mt-6 mb-12 text-center">
-                <button
-                    type="button"
-                    onClick={queryClosestRaces}
+                <Link
+                    to={linkToClosest}
                     className="rounded-full bg-indigo-600 mx-auto px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                     Find nearest corgi race
-                </button>
+                </Link>
             </div>
             <p className="w-full dark:text-gray-200 text-center italic mb-4 text-sm">Upcoming races</p>
             <div className="px-2 sm:px-4 md:px-20">
-                <RaceTable num={10} startTime={new Date()} asc={true} />
+                <RaceTable query={homepageQuery} />
             </div>
         </div>
     )

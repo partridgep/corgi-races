@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route,
 } from "react-router-dom";
 import { HomePage } from "./pages/HomePage/HomePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
-import { RaceList } from "./pages/RaceList";
+import { RaceList } from "./pages/RaceList/RaceList";
 import { RaceDetail } from "./pages/RaceDetail";
 
 export const Routing = () => {
