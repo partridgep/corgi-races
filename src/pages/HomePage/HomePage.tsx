@@ -1,9 +1,73 @@
 import { RaceTable } from "../../components/RaceTable"
+// import React, { useState } from 'react';
+import axios from 'axios';
 import './HomePage.css';
 
 export const HomePage = () => {
 
     const strongStr = "herding";
+
+    type Coordinates = {
+        latitude: number;
+        longitude: number;
+    }
+
+    if (!navigator.geolocation) {
+        alert("No geolocation available!");
+      }
+
+    const getUserLocation = (): Promise<Coordinates> => {
+        return new Promise((resolve, reject) => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const coords: Coordinates = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        };
+                        resolve(coords);
+                    },
+                    error => {
+                        reject(error);
+                    },
+                    {
+                        enableHighAccuracy: true, // Use GPS if available
+                        timeout: 10000, // Wait 10 seconds before timing out
+                        maximumAge: 0 // Do not use a cached position
+                    }
+                );
+            } else {
+                reject(new Error("Geolocation is not supported by this browser."));
+            }
+        });
+    }
+
+    const queryClosestRaces = async () => {
+        let userCoordinates: Coordinates | null = null;
+
+        await getUserLocation().then((coords: Coordinates) => {
+            console.log('User latitude:', coords.latitude);
+            console.log('User longitude:', coords.longitude);
+            userCoordinates = coords;
+            const queryParams = {
+                lat: userCoordinates.latitude.toString(),
+                lon: userCoordinates.longitude.toString(),
+                num: "5",
+                startTime: new Date().toISOString(),
+            }
+            let query = `/api/races?${new URLSearchParams(queryParams as Record<string, string>).toString()}`;
+            console.log(query);
+            axios.get(query)
+            .then(res => res.data)
+            .then(data => {
+                console.log(data);
+            });
+        })
+        .catch(error => {
+            console.error('Error getting user location:', error.message);
+            return;
+        });
+    }
 
     return (
         <div className="w-full pb-28">
@@ -33,6 +97,7 @@ export const HomePage = () => {
             <div className="w-full mx-auto mt-6 mb-12 text-center">
                 <button
                     type="button"
+                    onClick={queryClosestRaces}
                     className="rounded-full bg-indigo-600 mx-auto px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                     Find nearest corgi race

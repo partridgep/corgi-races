@@ -9,7 +9,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  @apply dark:bg-gray-900;
+  @apply dark:bg-zinc-900;
 }
 
 code {

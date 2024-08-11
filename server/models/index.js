@@ -10,6 +10,11 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.js')[env];
 const db = {};
 
+console.log(`database: ${config.database}`);
+console.log(`username: ${config.username}`);
+console.log(`password: ${config.password}`);
+console.log(`host: ${config.host}`);
+
 const sequelize = new Sequelize(
   config.database,
   config.username,

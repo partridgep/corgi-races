@@ -37,6 +37,14 @@ module.exports = (sequelize, DataTypes) => {
     },
     info_url: {
       type: DataTypes.STRING
+    },
+    latitude: {
+      type: DataTypes.FLOAT, // Using FLOAT for latitude
+      allowNull: true,       // Initially allowing null since existing records won't have these values
+    },
+    longitude: {
+      type: DataTypes.FLOAT, // Using FLOAT for longitude
+      allowNull: true,       // Initially allowing null
     }
   }, {
     sequelize,

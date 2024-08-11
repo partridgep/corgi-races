@@ -36,7 +36,7 @@ export const RaceTable = (
             .then(data => setData(data));
         }
         fetchData()
-    }, [ asc, endTime, num, startTime ]);
+    }, [ id, asc, endTime, num, startTime ]);
 
     function displayDate(dateStr?: string | null) {
         if (!dateStr) return
