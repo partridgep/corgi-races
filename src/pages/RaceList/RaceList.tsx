@@ -1,5 +1,5 @@
 import { RaceTable } from '../../components/RaceTable';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from "react-router-dom";
 import { QueryParams } from '../../types';
 
@@ -8,6 +8,8 @@ export const RaceList = () => {
     let [ searchParams ] = useSearchParams();
 
     const [query, setQuery] = useState<QueryParams>({});
+    const [geolocating, setGeolocating] = useState(false);
+    const [isQueryReady, setIsQueryReady] = useState(false);
 
     type Coordinates = {
         latitude: number;
@@ -18,19 +20,54 @@ export const RaceList = () => {
         alert("No geolocation available!");
       }
 
+    const getUserLocation = useCallback((): Promise<Coordinates> => {
+        return new Promise((resolve, reject) => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const coords: Coordinates = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                        };
+                        resolve(coords);
+                    },
+                    error => {
+                        reject(error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0,
+                    }
+                );
+            } else {
+                reject(new Error("Geolocation is not supported by this browser."));
+            }
+        });
+    }, []); // Empty dependency array
+
     useEffect(() => {
 
         const updateQueryParams = async () => {
-            // Convert searchParams to an object
             const params = Object.fromEntries([...searchParams]);
             console.log(params)
     
             let userCoordinates: Coordinates | null = null;
+            let needsGeolocation = false;
     
             if (params.closest) {
-                userCoordinates = await getUserLocation();
+                needsGeolocation = true;
+                setGeolocating(true)
+                try {
+                    userCoordinates = await getUserLocation();
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    setGeolocating(false);
+                }
             }
             else if (parseFloat(params.longitude) && parseFloat(params.latitude)) {
+                needsGeolocation = true;
                 userCoordinates = {
                     latitude: parseFloat(params.latitude),
                     longitude: parseFloat(params.longitude)
@@ -50,48 +87,21 @@ export const RaceList = () => {
                 queryParams.longitude = userCoordinates.longitude
             }
 
-            console.log("new query", query)
+            console.log("new query", queryParams)
     
             // set the items whenever searchParams change
             setQuery(queryParams);
+            setIsQueryReady(!needsGeolocation || !!userCoordinates);
         }
 
         // Call the async function
         updateQueryParams();
-    }, [searchParams]); // Dependency array with searchParams
-
-    const getUserLocation = (): Promise<Coordinates> => {
-        return new Promise((resolve, reject) => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    position => {
-                        const coords: Coordinates = {
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude
-                        };
-                        resolve(coords);
-                    },
-                    error => {
-                        reject(error);
-                    },
-                    {
-                        enableHighAccuracy: true, // Use GPS if available
-                        timeout: 10000, // Wait 10 seconds before timing out
-                        maximumAge: 0 // Do not use a cached position
-                    }
-                );
-            } else {
-                reject(new Error("Geolocation is not supported by this browser."));
-            }
-        });
-    }
+    }, [searchParams, getUserLocation]); // Dependency array with searchParams
 
     return (
-        <div className='p-4'>
-            <h1 className='text-lg font-semibold dark:text-white'>Corgi Races Search</h1>
-            <div className="px-2 sm:px-4 md:px-20">
-                <RaceTable query={query} />
-            </div>
+        <div className="px-2 sm:px-4 md:px-20">
+            <h1 className="text-lg font-semibold dark:text-white py-4">Corgi races locator</h1>
+            <RaceTable query={query} geolocating={geolocating} isQueryReady={isQueryReady} />
         </div>
     )
 }
