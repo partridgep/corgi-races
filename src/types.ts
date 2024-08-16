@@ -7,3 +7,12 @@ export type QueryParams = {
     longitude?: number;
     latitude?: number;
 };
+
+export type UrlParams = QueryParams & {
+    closest?: boolean
+};
+
+export type Coordinates = {
+    latitude: number;
+    longitude: number;
+}

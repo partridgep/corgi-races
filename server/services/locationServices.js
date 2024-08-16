@@ -2,29 +2,6 @@ const axios = require('axios');
 const db = require('../models');
 const { Race } = db;
 
-function getUserLocation() {
-    return new Promise((resolve, reject) => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    const { latitude, longitude } = position.coords;
-                    resolve({ latitude, longitude });
-                },
-                error => {
-                    reject(error);
-                },
-                {
-                    enableHighAccuracy: true, // Use GPS if available
-                    timeout: 10000, // Wait 10 seconds before timing out
-                    maximumAge: 0 // Do not use a cached position
-                }
-            );
-        } else {
-            reject(new Error("Geolocation is not supported by this browser."));
-        }
-    });
-}
-
 async function geocodeAddress(address, city, state) {
     const url = `https://nominatim.openstreetmap.org/search`;
     const params = {
@@ -90,7 +67,6 @@ async function updateRaceCoordinates() {
 
 
 module.exports = {
-    getUserLocation,
     geocodeAddress,
-    updateRaceCoordinates
+    updateRaceCoordinates,
 };
