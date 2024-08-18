@@ -9,7 +9,7 @@ export const HomePage = () => {
     const linkToClosest = `/races?num=10&startTime=${new Date().toISOString()}&closest=true&asc=true`;
     const homepageQuery = {
         num: 10,
-        startTime: new Date(),
+        startTime: new Date().toISOString(),
         asc: true
     }
 

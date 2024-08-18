@@ -1,8 +1,8 @@
 export type QueryParams = {
     id?: string;
     num?: number;
-    startTime?: Date;
-    endTime?: Date;
+    startTime?: string;
+    endTime?: string;
     asc?: boolean;
     longitude?: number;
     latitude?: number;

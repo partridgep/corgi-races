@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { QueryParams } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+import { LoadingCorgi } from './LoadingCorgi/LoadingCorgi';
 
 type tableProps = {
     query: QueryParams,
@@ -31,6 +32,8 @@ export const RaceTable = (
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        console.log("use effect!", [ id, asc, endTime, num, startTime, longitude, latitude, geolocating, isQueryReady ])
+
         setLoading(true)
         if (isQueryReady && !geolocating) {
             let query = `/api/races`
@@ -43,7 +46,6 @@ export const RaceTable = (
                 longitude,
                 latitude
             }
-            console.log(queryParams)
             // let query = `/api/races?${new URLSearchParams(queryParams as Record<string, string>).toString()}`;
             let count = 0
             for (let [ paramKey, paramVal ] of Object.entries(queryParams)) {
@@ -53,12 +55,12 @@ export const RaceTable = (
                     count++
                 }
             }
+            console.log("query: ", query)
             const fetchData = async () => {
                 axios.get(query)
                 .then(res => res.data)
                 .then(data => {
                     setData(data)
-                    console.log(data)
                     setLoading(false)
                 });
             }
@@ -115,7 +117,7 @@ export const RaceTable = (
                 </table>
             </div>
             :
-            <p>Loading...</p>
+            <LoadingCorgi />
             }
         </div>
     )

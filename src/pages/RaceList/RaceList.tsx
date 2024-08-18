@@ -64,7 +64,7 @@ export const RaceList = () => {
     const handleZipCodeUpdate = async (newZipCode: string) => {
         setState(prevState => ({ ...prevState, zipCode: newZipCode }));
         const newCoordinates = await getCoordinatesFromZipCode(newZipCode);
-        console.log(newCoordinates);
+        // console.log(newCoordinates);
 
         let newParams = { ...state.urlParams };
         delete newParams.closest;
@@ -87,7 +87,7 @@ export const RaceList = () => {
 
         const updateQueryParams = async () => {
             const params = Object.fromEntries([...searchParams]);
-            console.log(params)
+            // console.log(params)
             setState(prevState => ({ ...prevState, urlParams: params }));
     
             let userCoordinates: Coordinates | null = null;
@@ -121,8 +121,8 @@ export const RaceList = () => {
             let queryParams: QueryParams = {
                 id: params.id,
                 num: params.num ? Number(params.num) : undefined,
-                startTime: params.startTime ? new Date(params.startTime) : undefined,
-                endTime: params.endTime ? new Date(params.endTime) : undefined,
+                startTime: params.startTime ? new Date(params.startTime).toISOString() : undefined,
+                endTime: params.endTime ? new Date(params.endTime).toISOString() : undefined,
                 asc: params.asc ? params.asc === 'true' : undefined,
             }
             if (userCoordinates) {
@@ -130,7 +130,7 @@ export const RaceList = () => {
                 queryParams.longitude = userCoordinates.longitude
             }
 
-            console.log("new query", queryParams)
+            // console.log("new query", queryParams)
     
             setState(prevState => ({
                 ...prevState,
