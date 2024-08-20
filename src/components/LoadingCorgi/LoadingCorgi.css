@@ -32,7 +32,8 @@
     width: 110px;
     height: 45px;
     border-radius: 40px;
-    background-color: #c36e1c;
+    background-image: linear-gradient(#b96f2a, #c36e1c);
+    /* background-color: #c36e1c; */
     position: absolute;
     bottom: 15px;
 }
@@ -102,7 +103,7 @@
 .face {
     width: 40px;
     height: 36px;
-    background-color: white;
+    background-image: linear-gradient(#dd8c40, #c36e1c);
     border-radius: 100%;
     position: absolute;
     bottom: 0;
@@ -120,6 +121,14 @@
     top: 20px;
     left: 18px;
     transform: rotate(10deg);
+    /* overflow: hidden; */
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    z-index: 10; 
+}
+
+.mouth, .mouth::before, .mouth::after {
+    -webkit-appearance: none;
 }
 
 .mouth::after {
@@ -130,9 +139,14 @@
     border-bottom: 3px solid rgb(36, 36, 36);
     border-radius: 4px;
     position: absolute;
+    /* border: none; */
     top: 1.5px;
     left: 0px;
     transform: rotate(11deg);
+    outline: none;
+    box-shadow: none;
+    /* border: none; */
+    /* border-radius: inherit; */
 }
 
 /* tongue */
@@ -146,7 +160,7 @@
     top: -3px;
     left: 2px; 
     transform: rotate(-160deg);
-    box-shadow: 0 10px 10px rgba(0, 0, 0, 0.15);
+    /* box-shadow: 0 10px 10px rgba(0, 0, 0, 0.15); */
     animation: swing-tongue 0.22s 0.5s ease-in-out alternate infinite;
     transform-origin: bottom center; 
 }
@@ -164,7 +178,7 @@
 .snout {
     width: 40px;
     height: 40px;
-    background-color: white;
+    background-color: #dd8c40;
     clip-path: ellipse(29% 24% at 50% 1%);
     position: absolute;
     bottom: -25px;
@@ -175,7 +189,7 @@
     clip-path: ellipse(48% 14% at 3% 99%);
     width: 40px;
     height: 40px;
-    background-color: white;
+    background-color: #dd8c40;
     position: absolute;
     bottom: 15px;
     left: 26.15px;

@@ -4,6 +4,7 @@ import { QueryParams } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { LoadingCorgi } from './LoadingCorgi/LoadingCorgi';
+import MapLinks from './MapLinks'
 
 type tableProps = {
     query: QueryParams,
@@ -28,13 +29,35 @@ export const RaceTable = (
     : tableProps,
 ) => {
 
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [state, setState] = useState({
+        data: [],
+        loading: true,
+        showLoadingAnimation: true,
+    });
+
+    useEffect(() => {
+        if (state.loading) {
+            const timer = setTimeout(() => {
+                setState(prevState => ({
+                    ...prevState,
+                    showLoadingAnimation: state.loading
+                }));
+            }, 1000); // 1 second delay
+    
+            return () => clearTimeout(timer);
+        }
+        else {
+            setState(prevState => ({
+                ...prevState,
+                showLoadingAnimation: false
+            }));
+        }
+    }, [state.loading]);
 
     useEffect(() => {
         console.log("use effect!", [ id, asc, endTime, num, startTime, longitude, latitude, geolocating, isQueryReady ])
 
-        setLoading(true)
+        setState(prevState => ({ ...prevState, loading: true, showLoadingAnimation: false }));
         if (isQueryReady && !geolocating) {
             let query = `/api/races`
             const queryParams = {
@@ -60,8 +83,12 @@ export const RaceTable = (
                 axios.get(query)
                 .then(res => res.data)
                 .then(data => {
-                    setData(data)
-                    setLoading(false)
+                    setState(prevState => ({
+                        ...prevState,
+                        data,
+                        loading: false,
+                        showLoadingAnimation: false
+                    }));
                 });
             }
             fetchData()
@@ -78,28 +105,41 @@ export const RaceTable = (
 
     return (
         <div>
-            { !loading ? 
+            { state.loading && !state.showLoadingAnimation && null } {/* Initially nothing */}
+            { 
+                state.showLoadingAnimation && state.loading && 
+                <LoadingCorgi /> 
+            } {/* Corgi animation if loading takes more than 1 second */}
+            { !state.loading &&
             <div className="border dark:border-slate-700 rounded shadow" >
                 <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
                     <thead className="dark:bg-gray-700">
                         <tr>
                             <th scope="col" className="py-3.5 pl-4 px-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Date</th>
-                            <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white lg:table-cell">Location</th>
-                            <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white sm:table-cell">City</th>
-                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">State</th>
-                            <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white sm:table-cell">Organized by</th>
-                            <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white sm:table-cell">Direct Link</th>
+                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white lg:table-cell">Location</th>
+                            <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">City</th>
+                            <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">State</th>
+                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white sm:table-cell">Organized by</th>
+                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white sm:table-cell">Direct Link</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-500 bg-white dark:bg-slate-800">
-                        { data.map((race: raceKeys) => (
+                        { state.data.map((race: raceKeys) => (
                             <tr key={race.race_id}>
                                 <td className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-white sm:w-auto sm:max-w-none">{displayDate(race.datetime)}</td>
-                                <td className="hidden px-3 py-4 text-sm text-gray-900 dark:text-white lg:table-cell">{race.address}</td>
+                                <td className="px-3 py-4 text-sm text-gray-900 dark:text-white w-full sm:w-auto sm:max-w-none">
+                                    { (race.address && race.city && race.state) && 
+                                        <MapLinks
+                                            address={race.address}
+                                            city={race.city}
+                                            state={race.state}
+                                        />
+                                    }
+                                </td>
                                 <td className="hidden px-3 py-4 text-sm text-gray-900 dark:text-white lg:table-cell">{race.city}</td>
-                                <td className="px-3 py-4 text-sm text-gray-900 dark:text-white">{race.state}</td>
+                                <td className="hidden px-3 py-4 text-sm text-gray-900 dark:text-white lg:table-cell">{race.state}</td>
                                 <td></td>
-                                <td className="hidden px-3 py-4 text-sm text-gray-900 dark:text-white lg:table-cell">
+                                <td className="px-3 py-4 text-sm text-gray-900 dark:text-white">
                                     {race.info_url &&
                                         <a
                                             href={race.info_url}
@@ -116,8 +156,6 @@ export const RaceTable = (
                     </tbody>
                 </table>
             </div>
-            :
-            <LoadingCorgi />
             }
         </div>
     )

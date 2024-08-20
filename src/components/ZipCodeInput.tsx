@@ -23,14 +23,30 @@ export const ZipCodeInput = ({ zipCode, onZipCodeChange } : zipProps) => {
         }
     };
 
+    const handleZipInput = (e: React.FormEvent<HTMLInputElement>) => {
+        const input = e.target as HTMLInputElement;
+        if (input.value.length > 5) {
+          input.value = input.value.slice(0, 5);
+        }
+      };
+
     return (
         <div>
+            <label
+                htmlFor='zip-code'
+                className="block text-sm font-medium leading-6 text-gray-900 dark:text-gray-200"
+            >
+                Zip Code
+            </label>
             <input
                 type="number"
                 id="zip-code"
                 value={zipInput}
                 onChange={handleZipCodeChange}
-                className='text-black p-2 rounded'
+                onInput={handleZipInput}
+                max="99999"
+                pattern="/^-?\d+\.?\d*$/"
+                className="mt-2 block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
             />
         </div>
     );
