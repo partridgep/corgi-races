@@ -17,6 +17,7 @@ type raceKeys = {
     address?: string,
     city?: string,
     state?: string,
+    zipcode: string,
     info_url?: string
 }
 
@@ -116,29 +117,32 @@ export const RaceTable = (
                     <thead className="dark:bg-gray-700">
                         <tr>
                             <th scope="col" className="py-3.5 pl-4 px-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Date</th>
-                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white lg:table-cell">Location</th>
-                            <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">City</th>
-                            <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">State</th>
-                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white sm:table-cell">Organized by</th>
-                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white sm:table-cell">Direct Link</th>
+                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Location</th>
+                            <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white lg:table-cell">City</th>
+                            <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white lg:table-cell">State</th>
+                            <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white lg:table-cell">ZIP</th>
+                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white table-cell">Organized by</th>
+                            <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white table-cell">Direct Link</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200 dark:divide-gray-500 bg-white dark:bg-slate-800">
                         { state.data.map((race: raceKeys) => (
                             <tr key={race.race_id}>
-                                <td className="w-full max-w-0 py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-white sm:w-auto sm:max-w-none">{displayDate(race.datetime)}</td>
-                                <td className="px-3 py-4 text-sm text-gray-900 dark:text-white w-full sm:w-auto sm:max-w-none">
+                                <td className="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-white">{displayDate(race.datetime)}</td>
+                                <td className="px-3 py-4 text-sm text-gray-900 dark:text-white">
                                     { (race.address && race.city && race.state) && 
                                         <MapLinks
                                             address={race.address}
                                             city={race.city}
                                             state={race.state}
+                                            zipcode={race.zipcode}
                                         />
                                     }
                                 </td>
                                 <td className="hidden px-3 py-4 text-sm text-gray-900 dark:text-white lg:table-cell">{race.city}</td>
                                 <td className="hidden px-3 py-4 text-sm text-gray-900 dark:text-white lg:table-cell">{race.state}</td>
-                                <td></td>
+                                <td className="hidden px-3 py-4 text-sm text-gray-900 dark:text-white lg:table-cell">{race.zipcode}</td>
+                                <td className="px-3 py-4 text-sm text-gray-900 dark:text-white table-cell"></td>
                                 <td className="px-3 py-4 text-sm text-gray-900 dark:text-white">
                                     {race.info_url &&
                                         <a

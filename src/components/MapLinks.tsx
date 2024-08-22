@@ -4,9 +4,10 @@ type locationProps = {
     address: string,
     city: string,
     state: string,
+    zipcode: string
 }
 
-const MapLinks = ({ address, city, state }: locationProps) => {
+const MapLinks = ({ address, city, state, zipcode }: locationProps) => {
 
   const addressLink = useRef(
     // open on default maps app on iOS
@@ -14,10 +15,10 @@ const MapLinks = ({ address, city, state }: locationProps) => {
      (navigator.platform.indexOf("iPad") !== -1) || 
      (navigator.platform.indexOf("iPod") !== -1))
     ?
-    `maps://maps.google.com/maps/search/?api=1&query=${encodeURIComponent(address)},${encodeURIComponent(city)},${encodeURIComponent(state)}`
+    `maps://maps.google.com/maps/search/?api=1&query=${encodeURIComponent(address)},${encodeURIComponent(city)},${encodeURIComponent(state)},${encodeURIComponent(zipcode)}`
     // open in Google Maps otherwise
     :
-    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)},${encodeURIComponent(city)},${encodeURIComponent(state)}`
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)},${encodeURIComponent(city)},${encodeURIComponent(state)},${encodeURIComponent(zipcode)}`
   );
 
 
@@ -29,7 +30,8 @@ const MapLinks = ({ address, city, state }: locationProps) => {
             rel="noopener noreferrer"
             className='underline hover:text-gray-200 dark:hover:text-gray-300'
         >
-            {address}, {city}, {state}
+            {address}
+            <p className='lg:hidden'>{city} {state} {zipcode}</p>
         </a>
     </div>
   );

@@ -204,9 +204,19 @@
     left: 41.5px;
     border-radius: 100px;
 }
+.snout-nose::after {
+    content: '';
+    width: 3px;
+    height: 2px;
+    background-color: rgb(105, 105, 105);
+    position: absolute;
+    top: 0px;
+    left: 1.2px;
+    border-radius: 40px;
+}
 
 /* Eyes */
-.eyes {
+.eye-left {
     width: 6px;
     height: 8px;
     background-color: black;
@@ -217,26 +227,57 @@
     z-index: 4;
 }
 
-.eyes::before {
+.eye-left::before {
+    content: '';
+    width: 2.5px;
+    height: 2px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 2.25px;
+    left: 3px;
+}
+
+.corgi-eyes {
+    transform: scaleX(-70%) scaleY(75%) translateX(23px) translateY(-10px) rotate(-5deg);
+    transform-origin: bottom center;
+    position: absolute;
+}
+
+.corgi-mouth {
+    transform: scaleX(-40%) scaleY(40%) translateX(-20px) translateY(6px) rotate(-5deg);
+    transform-origin: bottom center;
+    position: absolute;
+}
+
+/* .eyebrow-left {
+    background: url("../../public/eye-left.svg") no-repeat;
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    top: 2.25px;
+    left: 3px;
+} */
+
+.eye-right {
+    width: 4.5px;
+    height: 6px;
+    background-color: black;
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    left: 21px;
+}
+
+.eye-right::before {
     content: '';
     width: 2px;
     height: 2px;
     background-color: white;
     border-radius: 50%;
     position: absolute;
-    top: 1px;
-    left: 1px;
-}
-
-.eyes::after {
-    content: '';
-    width: 4.5px;
-    height: 6px;
-    background-color: black;
-    border-radius: 50%;
-    position: absolute;
-    left: 12px;
-    top: 0;
+    top: 3px;
+    left: 3px;
 }
 
 /* Ears */
