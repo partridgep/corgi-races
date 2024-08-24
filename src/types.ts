@@ -1,6 +1,7 @@
 export type QueryParams = {
     id?: string;
     num?: number;
+    page?: number,
     startTime?: string;
     endTime?: string;
     asc?: boolean;

@@ -21,6 +21,7 @@ races.get("/", async (req, res) => {
 races.get("/query", async (req, res) => {
     try {
         const limit = parseInt(req.query.num)
+        const page = parseInt(req.query.page) ? parseInt(req.query.page) : 1
         let userLat, userLon
 
         // get user geolocation if requested and permitted
@@ -69,10 +70,24 @@ races.get("/query", async (req, res) => {
             {
                 order: orderClause,
                 limit: !isNaN(limit) ? limit : null,
+                offset: (page - 1) * limit,
                 where: whereClause,
             },
         )
-        res.status(200).json(foundRaces)
+        const totalRecords = await Race.count({
+            where: whereClause
+        })
+        const totalPages = Math.ceil(totalRecords / limit);
+
+        res.status(200).json({
+            results: foundRaces,
+            pagination: {
+                currentPage: page,
+                pageSize: limit,
+                totalPages: totalPages,
+                totalRecords: totalRecords
+              }
+        })
     } catch (error) {
         res.status(500).send("Server error")
         console.log(error)

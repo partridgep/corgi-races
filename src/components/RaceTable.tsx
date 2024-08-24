@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { QueryParams } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
@@ -10,6 +10,12 @@ type tableProps = {
     query: QueryParams,
     geolocating?: Boolean,
     isQueryReady: boolean;
+    onPaginationData?: (data: {
+        currentPage: number;
+        pageSize: number;
+        totalPages: number;
+        totalRecords: number;
+    }) => void;
 }
 type raceKeys = {
     race_id: string,
@@ -23,7 +29,8 @@ type raceKeys = {
 
 export const RaceTable = (
     { 
-        query: { id, num, startTime, endTime, asc, longitude, latitude },
+        query: { id, num, page, startTime, endTime, asc, longitude, latitude },
+        onPaginationData,
         geolocating,
         isQueryReady
     }
@@ -32,10 +39,33 @@ export const RaceTable = (
 
     const [state, setState] = useState({
         data: [],
+        pagination: {
+            currentPage: 1,
+            pageSize: 10,
+            totalPages: 0,
+            totalRecords: 0
+        },
         loading: true,
         showLoadingAnimation: true,
     });
 
+    function useQueryParams({ id, asc, endTime, num, page, startTime, longitude, latitude }: QueryParams) {
+        return useMemo(() => {
+            return {
+                id,
+                asc,
+                endTime,
+                num,
+                page,
+                startTime,
+                longitude,
+                latitude
+            };
+        }, [id, asc, endTime, num, page, startTime, longitude, latitude]);
+    }
+    
+    const queryParams = useQueryParams({ id, asc, endTime, num, page, startTime, longitude, latitude });
+    
     useEffect(() => {
         if (state.loading) {
             const timer = setTimeout(() => {
@@ -56,45 +86,43 @@ export const RaceTable = (
     }, [state.loading]);
 
     useEffect(() => {
-        console.log("use effect!", [ id, asc, endTime, num, startTime, longitude, latitude, geolocating, isQueryReady ])
+        console.log("use effect triggered", queryParams, geolocating, isQueryReady);
 
         setState(prevState => ({ ...prevState, loading: true, showLoadingAnimation: false }));
+
+        // Only fetch data when the query is ready and geolocation has completed
         if (isQueryReady && !geolocating) {
+            console.log("query ready, done geolocating, go fetch!")
             let query = `/api/races`
-            const queryParams = {
-                id,
-                num,
-                startTime,
-                endTime,
-                asc,
-                longitude,
-                latitude
-            }
-            // let query = `/api/races?${new URLSearchParams(queryParams as Record<string, string>).toString()}`;
             let count = 0
-            for (let [ paramKey, paramVal ] of Object.entries(queryParams)) {
+            for (let [paramKey, paramVal] of Object.entries(queryParams)) {
                 if (paramVal !== null && paramVal !== undefined) {
-                    if (count === 0) query += `/query?${paramKey}=${paramVal}`
-                    else query += `&${paramKey}=${paramVal}`
-                    count++
+                    if (count === 0) query += `/query?${paramKey}=${paramVal}`;
+                    else query += `&${paramKey}=${paramVal}`;
+                    count++;
                 }
             }
             console.log("query: ", query)
+
             const fetchData = async () => {
                 axios.get(query)
                 .then(res => res.data)
                 .then(data => {
+                    console.log(data)
                     setState(prevState => ({
                         ...prevState,
-                        data,
+                        data: data.results,
+                        pagination: data.pagination,
                         loading: false,
                         showLoadingAnimation: false
                     }));
+                    // Send pagination data to parent component
+                    if (onPaginationData) onPaginationData(data.pagination);
                 });
             }
             fetchData()
         }
-    }, [ id, asc, endTime, num, startTime, longitude, latitude, geolocating, isQueryReady ]);
+    }, [ queryParams, geolocating, isQueryReady ]);
 
     function displayDate(dateStr?: string | null) {
         if (!dateStr) return
