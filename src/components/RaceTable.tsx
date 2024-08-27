@@ -1,6 +1,6 @@
 import axios from 'axios';
-import React, { useState, useEffect, useMemo } from 'react';
-import { QueryParams } from '../types';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { QueryParams, Pagination } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { LoadingCorgi } from './LoadingCorgi/LoadingCorgi';
@@ -10,12 +10,7 @@ type tableProps = {
     query: QueryParams,
     geolocating?: Boolean,
     isQueryReady: boolean;
-    onPaginationData?: (data: {
-        currentPage: number;
-        pageSize: number;
-        totalPages: number;
-        totalRecords: number;
-    }) => void;
+    onPaginationData?: (data: Pagination) => void;
 }
 type raceKeys = {
     race_id: string,
@@ -48,6 +43,9 @@ export const RaceTable = (
         loading: true,
         showLoadingAnimation: true,
     });
+
+    // Ref to track the previous onPaginationData
+    const prevOnPaginationDataRef = useRef(onPaginationData);
 
     function useQueryParams({ id, asc, endTime, num, page, startTime, longitude, latitude }: QueryParams) {
         return useMemo(() => {
@@ -88,6 +86,12 @@ export const RaceTable = (
     useEffect(() => {
         console.log("use effect triggered", queryParams, geolocating, isQueryReady);
 
+         // Avoid unnecessary re-renders due to unchanged onPaginationData
+         // if `onPaginationData` changes, update the ref and skip the current render
+        if (prevOnPaginationDataRef.current !== onPaginationData) {
+            prevOnPaginationDataRef.current = onPaginationData;
+            return;
+        }
         setState(prevState => ({ ...prevState, loading: true, showLoadingAnimation: false }));
 
         // Only fetch data when the query is ready and geolocation has completed
@@ -105,24 +109,27 @@ export const RaceTable = (
             console.log("query: ", query)
 
             const fetchData = async () => {
-                axios.get(query)
-                .then(res => res.data)
-                .then(data => {
-                    console.log(data)
+                try {
+                    const response = await axios.get(query);
+                    const data = response.data;
+    
                     setState(prevState => ({
                         ...prevState,
                         data: data.results,
                         pagination: data.pagination,
                         loading: false,
-                        showLoadingAnimation: false
+                        showLoadingAnimation: false,
                     }));
+    
                     // Send pagination data to parent component
-                    if (onPaginationData) onPaginationData(data.pagination);
-                });
-            }
+                    onPaginationData && onPaginationData(data.pagination);
+                } catch (error) {
+                    console.error("Error fetching race data:", error);
+                }
+            };
             fetchData()
         }
-    }, [ queryParams, geolocating, isQueryReady ]);
+    }, [ queryParams, geolocating, isQueryReady, onPaginationData ]);
 
     function displayDate(dateStr?: string | null) {
         if (!dateStr) return

@@ -17,3 +17,10 @@ export type Coordinates = {
     latitude: number;
     longitude: number;
 }
+
+export type Pagination = {
+    currentPage: number,
+    pageSize: number,
+    totalPages: number,
+    totalRecords: number,
+}
