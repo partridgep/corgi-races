@@ -85,7 +85,7 @@ const PaginationButton: React.FC<PaginationButtonProps> = ({
     <div className="w-full flex items-center justify-between sm:border-t sm:border-gray-200 sm:py-3">
       <div className="flex flex-1 items-center justify-between flex-wrap flex-row-reverse sm:flex-row">
         <div className="w-full sm:w-auto pb-4">
-          <p className="text-sm text-gray-700 dark:text-gray-300">
+          <p className="text-sm text-gray-700 dark:text-gray-300 text-center">
             Showing{' '}
             <span className="font-medium">
               {1 + count * (page - 1)}
@@ -101,7 +101,7 @@ const PaginationButton: React.FC<PaginationButtonProps> = ({
             result{total > 1 ? 's' : ''}
           </p>
         </div>
-        <div className="w-full sm:w-auto pb-4">
+        <div className="pb-4 mx-auto sm:mr-0">
           <nav
             className="isolate inline-flex -space-x-px rounded-md shadow-sm"
             aria-label="Pagination"

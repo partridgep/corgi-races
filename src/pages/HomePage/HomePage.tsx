@@ -6,7 +6,7 @@ export const HomePage = () => {
 
     const strongStr = "herding";
 
-    const linkToClosest = `/races?num=10&startTime=${new Date().toISOString()}&closest=true&asc=true`;
+    const linkToClosest = `/races?num=10&startTime=${new Date().toISOString()}&closest=true&asc=true&page=1`;
     const homepageQuery = {
         num: 10,
         startTime: new Date().toISOString(),
@@ -48,7 +48,7 @@ export const HomePage = () => {
             </div>
             <p className="w-full dark:text-gray-200 text-center italic mb-4 text-sm">Upcoming races</p>
             <div className="px-2 sm:px-4 md:px-20">
-                <RaceTable query={homepageQuery} isQueryReady={true} />
+                <RaceTable query={homepageQuery} isQueryReady={true} allowOrdering={false} />
             </div>
         </div>
     )

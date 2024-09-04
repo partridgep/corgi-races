@@ -47,8 +47,8 @@ export async function getCoordinatesFromZipCode(zipCode) {
 
     try {
         const response = await fetch(url);
-        console.log(response)
         const data = await response.json();
+        console.log(data)
 
         if (data.length > 0) {
             const { lat, lon } = data[0];

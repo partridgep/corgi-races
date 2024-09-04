@@ -6,6 +6,7 @@ import { useSearchParams } from "react-router-dom";
 import { QueryParams, UrlParams, Coordinates, Pagination } from '../../types';
 import { getUserZipCode, getCoordinatesFromZipCode } from '../../services/locationServices';
 import useUserLocation from '../../hooks/useUserLocation';
+import ItemsPerPage from '../../components/ItemsPerPage';
 
 export const RaceList = () => {
 
@@ -69,12 +70,23 @@ export const RaceList = () => {
     const updateZIPCode = useCallback(
         async (userCoordinates: Coordinates) => {
             const zipCode = await getUserZipCode(userCoordinates);
-            setState(prevState => ({ ...prevState, zipCode }));
-        }, [] 
+            setState(prevState => ({
+                ...prevState,
+                zipCode,
+            }));
+        }, []
     );
 
-    const handleZipCodeUpdate = async (newZipCode: string) => {
-        setState(prevState => ({ ...prevState, zipCode: newZipCode }));
+    const handleZipCodeUpdate = useCallback( async (newZipCode: string) => {
+        console.log("handleZipCodeUpdate")
+        setState(prevState => ({
+            ...prevState,
+            zipCode: newZipCode,
+            pagination: {
+                ...prevState.pagination,
+                currentPage: 1,
+            },
+        }));
         const newCoordinates = await getCoordinatesFromZipCode(newZipCode);
         // console.log(newCoordinates);
 
@@ -82,6 +94,7 @@ export const RaceList = () => {
         delete newParams.closest;
         newParams.longitude = newCoordinates?.longitude;
         newParams.latitude = newCoordinates?.latitude;
+        newParams.page = 1;
 
         // Convert all values to strings
         const stringParams: Record<string, string> = {};
@@ -93,7 +106,7 @@ export const RaceList = () => {
 
         // update URL params for longitude & latitude
         setSearchParams(stringParams)
-    };
+    }, [setSearchParams]);
 
     const handlePaginationData = useCallback((pagination: {
         currentPage: number;
@@ -103,7 +116,7 @@ export const RaceList = () => {
       }) => {
 
         console.log("new pagination from query", pagination)
-        console.log("URLParams", refs.current.urlParams)
+        // console.log("URLParams", refs.current.urlParams)
 
         setState(prevState => ({ ...prevState, pagination }));
 
@@ -131,7 +144,7 @@ export const RaceList = () => {
 
     const handlePageNumberChange = (currentPage: number) => {
         if (currentPage !== refs.current.urlParams.page) {
-            console.log("update URL page")
+            // console.log("update URL page")
             
             let newParams = { ...refs.current.urlParams };
             newParams.page = currentPage;
@@ -148,6 +161,51 @@ export const RaceList = () => {
             setSearchParams(stringParams)
 
         }
+    };
+
+    const handlePerPageChange = useCallback( async (newNum: number) => {
+        if (refs.current.urlParams.num === undefined) return 
+        
+        console.log("check URL params per page", refs.current.urlParams.num, "versus newNum", newNum)
+        if (newNum !== refs.current.urlParams.num) {
+            console.log("update URL per page")
+            
+            let newParams = { ...refs.current.urlParams };
+            newParams.num = newNum;
+
+            // Convert all values to strings
+            const stringParams: Record<string, string> = {};
+            Object.entries(newParams).forEach(([key, value]) => {
+                if (value !== undefined) {
+                    stringParams[key] = String(value);
+                }
+            });
+
+            // update URL params
+            setSearchParams(stringParams)
+
+        }
+    }, [setSearchParams]);
+
+    const handleOrderSwitch = (asc: boolean) => {
+
+        console.log("new order", asc);
+        console.log("update URL per page")
+            
+        let newParams = { ...refs.current.urlParams };
+        newParams.asc = asc;
+
+        // Convert all values to strings
+        const stringParams: Record<string, string> = {};
+        Object.entries(newParams).forEach(([key, value]) => {
+            if (value !== undefined) {
+                stringParams[key] = String(value);
+            }
+        });
+
+        // update URL params
+        setSearchParams(stringParams)
+        
     };
 
     useEffect(() => {
@@ -172,16 +230,17 @@ export const RaceList = () => {
 
             // Avoid updating state if params have not changed
             if (JSON.stringify(newUrlParams) !== JSON.stringify(refs.current.urlParams)) {
-                console.log("setting url params in hook", newUrlParams);
+                // console.log("setting url params in hook", newUrlParams);
                 refs.current.urlParams = newUrlParams;
             } else {
-                console.log("no need to update URL params");
+                // console.log("no need to update URL params");
             }
     
             let userCoordinates: Coordinates | null = null;
             let needsGeolocation = false;
     
             if (params.closest) {
+                console.log("we gotta wait for geolocation")
                 needsGeolocation = true;
                 setState(prevState => ({ ...prevState, geolocating: true }));
                 try {
@@ -218,9 +277,11 @@ export const RaceList = () => {
                 queryParams.latitude = userCoordinates.latitude
                 queryParams.longitude = userCoordinates.longitude
             }
+
+            console.log("ready to set URL params")
     
             if (JSON.stringify(queryParams) !== JSON.stringify(refs.current.query)) {
-                console.log("setting query state!")
+                // console.log("setting query state!")
                 refs.current.query = queryParams;
                 setState(prevState => ({
                     ...prevState,
@@ -228,7 +289,7 @@ export const RaceList = () => {
                     isQueryReady: !needsGeolocation || !!userCoordinates,
                 }));
             }
-            else console.log("do not change state")
+            // else console.log("do not change state")
         }
 
         // Call the async function
@@ -238,24 +299,29 @@ export const RaceList = () => {
     return (
         <div className="px-2 sm:px-4 md:px-20">
             <h1 className="text-lg font-semibold dark:text-white py-4">Corgi races locator</h1>
-            <div className='mt-2 mb-6'>
-                <ZipCodeInput zipCode={state.zipCode} onZipCodeChange={handleZipCodeUpdate} />
+            <div className='w-full flex flex-col sm:flex-row justify-between mt-2 mb-6 gap-y-4'>
+                <ZipCodeInput zipCode={state.zipCode || ''} onZipCodeChange={handleZipCodeUpdate} />
+                <ItemsPerPage num={refs.current.query.num || 5} onPerPageChange={handlePerPageChange} />
             </div>
             <RaceTable
                 query={refs.current.query}
                 geolocating={state.geolocating}
                 isQueryReady={state.isQueryReady}
                 onPaginationData={handlePaginationData}
+                onOrderSwitch={handleOrderSwitch}
             />
-            <div className='mt-6'>
-                <PaginationButton
-                    page={refs.current.query.page || 1}
-                    count={refs.current.query.num || 5}
-                    total={state.pagination.totalRecords}
-                    noFurtherPages={ state.pagination.currentPage >= state.pagination.totalPages }
-                    changePageNumber={handlePageNumberChange}
-                />
-            </div>
+            {
+                // (state.pagination.totalRecords > 0) &&
+                <div className='mt-6'>
+                    <PaginationButton
+                        page={refs.current.query.page || 1}
+                        count={refs.current.query.num || 5}
+                        total={state.pagination.totalRecords}
+                        noFurtherPages={ state.pagination.currentPage >= state.pagination.totalPages }
+                        changePageNumber={handlePageNumberChange}
+                    />
+                </div>
+            }
         </div>
     )
 }

@@ -3,7 +3,7 @@ const { where } = require('sequelize')
 const db = require('../models')
 const { Race } = db
 const { Op } = require('sequelize')
-const { getUserLocation } = require('../services/locationServices')
+const Sequelize = require('sequelize');
 
 // GET ALL RACES
 races.get("/", async (req, res) => {
@@ -25,9 +25,9 @@ races.get("/query", async (req, res) => {
         let userLat, userLon
 
         // get user geolocation if requested and permitted
-        if (req.query.lat && req.query.lon) {
-            userLat = parseFloat(req.query.lat)
-            userLon = parseFloat(req.query.lon)
+        if (req.query.latitude && req.query.longitude) {
+            userLat = parseFloat(req.query.latitude)
+            userLon = parseFloat(req.query.longitude)
         }
 
         // construct where clause
@@ -48,12 +48,12 @@ races.get("/query", async (req, res) => {
                 [Op.lte]: new Date(req.query.endTime)
             }
         }
-
-        // Calculate distance only if user's latitude and longitude are provided
+        
         let orderClause = [
             ['datetime', req.query.asc === "true" ? 'ASC' : 'DESC'],
         ];
 
+        // Calculate distance only if user's latitude and longitude are provided
         if (!isNaN(userLat) && !isNaN(userLon)) {
             orderClause.unshift([
                 Sequelize.literal(`
@@ -86,7 +86,8 @@ races.get("/query", async (req, res) => {
                 pageSize: limit,
                 totalPages: totalPages,
                 totalRecords: totalRecords
-              }
+            },
+            order_by: orderClause
         })
     } catch (error) {
         res.status(500).send("Server error")

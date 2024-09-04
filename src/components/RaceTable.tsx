@@ -1,16 +1,18 @@
 import axios from 'axios';
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { QueryParams, Pagination } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUpRightFromSquare, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import { LoadingCorgi } from './LoadingCorgi/LoadingCorgi';
 import MapLinks from './MapLinks'
 
 type tableProps = {
     query: QueryParams,
     geolocating?: Boolean,
-    isQueryReady: boolean;
-    onPaginationData?: (data: Pagination) => void;
+    isQueryReady: boolean,
+    onPaginationData?: (data: Pagination) => void,
+    onOrderSwitch?: (asc: boolean) => void,
+    allowOrdering?: boolean
 }
 type raceKeys = {
     race_id: string,
@@ -21,13 +23,17 @@ type raceKeys = {
     zipcode: string,
     info_url?: string
 }
+type OrderClause = [string | { val: string }, 'ASC' | 'DESC'];
+type OrderBy = OrderClause[];
 
 export const RaceTable = (
     { 
         query: { id, num, page, startTime, endTime, asc, longitude, latitude },
         onPaginationData,
+        onOrderSwitch,
         geolocating,
-        isQueryReady
+        isQueryReady,
+        allowOrdering = true
     }
     : tableProps,
 ) => {
@@ -40,6 +46,7 @@ export const RaceTable = (
             totalPages: 0,
             totalRecords: 0
         },
+        orderBy: [],
         loading: true,
         showLoadingAnimation: true,
     });
@@ -63,6 +70,17 @@ export const RaceTable = (
     }
     
     const queryParams = useQueryParams({ id, asc, endTime, num, page, startTime, longitude, latitude });
+
+    const checkOrder = useCallback((orderBy: OrderBy): "ASC" | "DESC" | null => {
+        if (!allowOrdering) return null
+        for (let ordering of orderBy) {
+            // check if the first element of the tuple is 'datetime'
+            // return the order ('ASC' or 'DESC')
+            if (ordering[0] === "datetime") return ordering[1]
+        }
+        return null
+    }, [allowOrdering]);
+    const dateOrdering = useMemo(() => checkOrder(state.orderBy), [state.orderBy, checkOrder]);
     
     useEffect(() => {
         if (state.loading) {
@@ -84,7 +102,7 @@ export const RaceTable = (
     }, [state.loading]);
 
     useEffect(() => {
-        console.log("use effect triggered", queryParams, geolocating, isQueryReady);
+        // console.log("use effect triggered", queryParams, geolocating, isQueryReady);
 
          // Avoid unnecessary re-renders due to unchanged onPaginationData
          // if `onPaginationData` changes, update the ref and skip the current render
@@ -96,7 +114,7 @@ export const RaceTable = (
 
         // Only fetch data when the query is ready and geolocation has completed
         if (isQueryReady && !geolocating) {
-            console.log("query ready, done geolocating, go fetch!")
+            // console.log("query ready, done geolocating, go fetch!")
             let query = `/api/races`
             let count = 0
             for (let [paramKey, paramVal] of Object.entries(queryParams)) {
@@ -112,11 +130,13 @@ export const RaceTable = (
                 try {
                     const response = await axios.get(query);
                     const data = response.data;
+                    console.log("new data", response.data)
     
                     setState(prevState => ({
                         ...prevState,
                         data: data.results,
                         pagination: data.pagination,
+                        orderBy: data.order_by,
                         loading: false,
                         showLoadingAnimation: false,
                     }));
@@ -139,6 +159,13 @@ export const RaceTable = (
         return `${d.toLocaleDateString()} ${timeWithoutSeconds}`
     }
 
+    // Handle page number click
+    const handleOrderSwitch = () => {
+        if (!onOrderSwitch) return;
+        if (!dateOrdering) onOrderSwitch(true);
+        else onOrderSwitch(dateOrdering !== "ASC");
+    };
+
     return (
         <div>
             { state.loading && !state.showLoadingAnimation && null } {/* Initially nothing */}
@@ -151,7 +178,28 @@ export const RaceTable = (
                 <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
                     <thead className="dark:bg-gray-700">
                         <tr>
-                            <th scope="col" className="py-3.5 pl-4 px-3 text-left text-sm font-semibold text-gray-900 dark:text-white">Date</th>
+                            <th scope="col" className="py-3.5 pl-4 px-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
+                                { dateOrdering
+                                    ? 
+                                    <button
+                                        onClick={() => handleOrderSwitch()}
+                                        className='flex gap-x-2'
+                                    >
+                                        Date
+                                        <div>
+                                            {
+                                                dateOrdering === "ASC"
+                                                ?
+                                                <FontAwesomeIcon icon={faArrowDown} />
+                                                :
+                                                <FontAwesomeIcon icon={faArrowUp} />
+                                            }
+                                        </div>
+                                    </button>
+                                    :
+                                    <p>Date</p>
+                                }
+                            </th>
                             <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Location</th>
                             <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white lg:table-cell">City</th>
                             <th scope="col" className="hidden px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white lg:table-cell">State</th>
