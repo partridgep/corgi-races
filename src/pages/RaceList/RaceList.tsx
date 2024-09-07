@@ -24,6 +24,7 @@ export const RaceList = () => {
             totalRecords: 0,
         } as Pagination,
         geolocating: false,
+        geolocationFailed: false,
         isQueryReady: false,
         zipCode: '',
     });
@@ -53,6 +54,8 @@ export const RaceList = () => {
                     },
                     error => {
                         reject(error);
+                        console.log("reject 1")
+                        // add warning to frontend
                     },
                     {
                         enableHighAccuracy: true,
@@ -61,6 +64,7 @@ export const RaceList = () => {
                     }
                 );
             } else {
+                console.log("reject 2")
                 reject(new Error("Geolocation is not supported by this browser."));
             }
         });
@@ -238,6 +242,7 @@ export const RaceList = () => {
     
             let userCoordinates: Coordinates | null = null;
             let needsGeolocation = false;
+            let geolocationFailed = false;
     
             if (params.closest) {
                 console.log("we gotta wait for geolocation")
@@ -247,9 +252,14 @@ export const RaceList = () => {
                     if (globalUserCoordinates) userCoordinates = globalUserCoordinates;
                     else userCoordinates = await getUserLocation();
                 } catch (error) {
+                    geolocationFailed = true;
                     console.error(error);
                 } finally {
-                    setState(prevState => ({ ...prevState, geolocating: false }));
+                    setState(prevState => ({
+                        ...prevState,
+                        geolocating: false,
+                        geolocationFailed
+                    }));
                 }
             }
             else if (parseFloat(params.longitude) && parseFloat(params.latitude)) {
@@ -280,13 +290,14 @@ export const RaceList = () => {
 
             console.log("ready to set URL params")
     
-            if (JSON.stringify(queryParams) !== JSON.stringify(refs.current.query)) {
+            console.log(queryParams, geolocationFailed)
+            if (JSON.stringify(queryParams) !== JSON.stringify(refs.current.query) || geolocationFailed) {
                 // console.log("setting query state!")
                 refs.current.query = queryParams;
                 setState(prevState => ({
                     ...prevState,
                     // query: queryParams,
-                    isQueryReady: !needsGeolocation || !!userCoordinates,
+                    isQueryReady: !needsGeolocation || !!userCoordinates || geolocationFailed,
                 }));
             }
             // else console.log("do not change state")
@@ -297,8 +308,8 @@ export const RaceList = () => {
     }, [searchParams, globalUserCoordinates, getUserLocation, updateZIPCode]);
 
     return (
-        <div className="px-2 sm:px-4 md:px-20">
-            <h1 className="text-lg font-semibold dark:text-white py-4">Corgi races locator</h1>
+        <div className="px-2 sm:px-4 md:px-20 md:pt-6">
+            {/* <h1 className="text-lg font-semibold dark:text-white py-4">Corgi races locator</h1> */}
             <div className='w-full flex flex-col sm:flex-row justify-between mt-2 mb-6 gap-y-4'>
                 <ZipCodeInput zipCode={state.zipCode || ''} onZipCodeChange={handleZipCodeUpdate} />
                 <ItemsPerPage num={refs.current.query.num || 5} onPerPageChange={handlePerPageChange} />
@@ -306,12 +317,13 @@ export const RaceList = () => {
             <RaceTable
                 query={refs.current.query}
                 geolocating={state.geolocating}
+                geolocationFailed={state.geolocationFailed}
                 isQueryReady={state.isQueryReady}
                 onPaginationData={handlePaginationData}
                 onOrderSwitch={handleOrderSwitch}
             />
             {
-                // (state.pagination.totalRecords > 0) &&
+                (!state.geolocating && !state.geolocationFailed) &&
                 <div className='mt-6'>
                     <PaginationButton
                         page={refs.current.query.page || 1}

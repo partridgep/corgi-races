@@ -2,13 +2,14 @@ import axios from 'axios';
 import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { QueryParams, Pagination } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUpRightFromSquare, faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUpRightFromSquare, faArrowDown, faArrowUp, faExclamationCircle, faLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { LoadingCorgi } from './LoadingCorgi/LoadingCorgi';
 import MapLinks from './MapLinks'
 
 type tableProps = {
     query: QueryParams,
-    geolocating?: Boolean,
+    geolocating?: boolean,
+    geolocationFailed?: boolean,
     isQueryReady: boolean,
     onPaginationData?: (data: Pagination) => void,
     onOrderSwitch?: (asc: boolean) => void,
@@ -32,6 +33,7 @@ export const RaceTable = (
         onPaginationData,
         onOrderSwitch,
         geolocating,
+        geolocationFailed = false,
         isQueryReady,
         allowOrdering = true
     }
@@ -173,10 +175,19 @@ export const RaceTable = (
                 state.showLoadingAnimation && state.loading && 
                 <LoadingCorgi /> 
             } {/* Corgi animation if loading takes more than 1 second */}
-            { !state.loading &&
-            <div className="border dark:border-slate-700 rounded shadow" >
+            { (!state.loading && geolocationFailed) &&
+            <div className='flex flex-col items-center justify-center gap-y-3 mt-10'>
+                <div className='relative'>
+                    <FontAwesomeIcon icon={faLocationDot} size="2xl" className='w-10 h-10 text-orange-400 stroke'/>
+                    <FontAwesomeIcon icon={faExclamationCircle} size="lg" className='absolute -bottom-0.5 -right-0.5 text-orange-700 dark:text-gray-400 drop-shadow-2xl stroke dark:stroke-gray-900 stroke-1'/>
+                </div>
+                <p className='text-sm'>Could not find your location!</p>
+            </div>
+            }
+            { (!state.loading && !geolocationFailed) &&
+            <div className="border dark:border-slate-700 rounded shadow overflow-scroll" >
                 <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
-                    <thead className="dark:bg-gray-700">
+                    <thead className="bg-gray-50 dark:bg-gray-700">
                         <tr>
                             <th scope="col" className="py-3.5 pl-4 px-3 text-left text-sm font-semibold text-gray-900 dark:text-white">
                                 { dateOrdering

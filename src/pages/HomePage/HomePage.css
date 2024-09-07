@@ -1,7 +1,3 @@
-.subtitle {
-    color: #c36e1c;
-}
-
 .short-animate {
     display: inline-block;
     animation: shorten 8s ease-in-out 1 forwards;

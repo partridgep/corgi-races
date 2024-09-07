@@ -28,7 +28,7 @@ const MapLinks = ({ address, city, state, zipcode }: locationProps) => {
             href={addressLink.current}
             target="_blank"
             rel="noopener noreferrer"
-            className='underline hover:text-gray-200 dark:hover:text-gray-300'
+            className='underline hover:text-gray-500 dark:hover:text-gray-300'
         >
             {address}
             <p className='lg:hidden'>{city} {state} {zipcode}</p>

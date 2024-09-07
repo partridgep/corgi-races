@@ -1,0 +1,26 @@
+.logoHovered .passing-line-top, .logoHovered .passing-line-bottom {
+    animation: line 0.5s linear infinite;
+}
+
+.logoHovered .passing-line-orange {
+    animation: line 0.7s 0.025s linear infinite;
+}
+
+.bottom-blue, .logo-corgi {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.47, 0, 0.23, 1.38);
+    transition-duration: 150ms;
+}
+
+.logoHovered .bottom-blue {
+    opacity: 20%;
+}
+
+.logoHovered .logo-corgi {
+    transform: rotate(-3deg);
+}
+
+@keyframes line {
+    0%   { transform: translate(1000px); }
+    100%  { transform: translate(-1000px); }
+  }
