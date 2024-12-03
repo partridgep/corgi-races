@@ -181,7 +181,7 @@ export const RaceTable = (
                     <FontAwesomeIcon icon={faLocationDot} size="2xl" className='w-10 h-10 text-orange-400 stroke'/>
                     <FontAwesomeIcon icon={faExclamationCircle} size="lg" className='absolute -bottom-0.5 -right-0.5 text-orange-700 dark:text-gray-400 drop-shadow-2xl stroke dark:stroke-gray-900 stroke-1'/>
                 </div>
-                <p className='text-sm'>Could not find your location!</p>
+                <p className='text-sm'>Could not determine your location!</p>
             </div>
             }
             { (!state.loading && !geolocationFailed) &&

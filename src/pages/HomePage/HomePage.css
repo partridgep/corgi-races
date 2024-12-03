@@ -1,3 +1,43 @@
+.musubi-img {
+    width: 6rem;
+    /* margin-left: 6rem; */
+}
+
+@media screen and (min-width: 1028px) {
+    .musubi-img {
+        width: 9vw;
+        max-width: 185px;
+        margin-left: 0;
+    }
+}
+
+.subtitle-wrapper {
+    min-width: 82%;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    white-space: pre-wrap;
+}
+
+@media screen and (min-width: 640px) {
+    .subtitle {
+        font-size: 2.9vw;
+    }
+}
+
+@media screen and (min-width: 1024px) and (max-width: 1531px) {
+    .subtitle {
+        font-size: 2.2vw;
+    }
+}
+
+@media screen and (min-width: 1532px) {
+    .subtitle {
+        font-size: 40px;
+    }
+}
+
 .short-animate {
     display: inline-block;
     animation: shorten 8s ease-in-out 1 forwards;
@@ -9,10 +49,24 @@
 
 .long-animate {
     display: inline-block;
-    animation: elongate 16s ease-in-out 1 forwards;
 }
 
+@media screen and (max-width: 1023px) {
+    .long-animate {
+        animation: elongate-moveLeft 16s ease-in-out 1 forwards;
+    }
+  }
+
+@media screen and (min-width: 1024px) {
+    .long-animate {
+        animation: elongate 16s ease-in-out 1 forwards;
+    }
+  }
+
 @keyframes elongate {
+    to   { transform: scale(1.5, 1); }
+}
+@keyframes elongate-moveLeft {
     to   { transform: scale(1.5, 1) translate(-12.5%, 0%); }
 }
 

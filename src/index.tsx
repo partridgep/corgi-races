@@ -4,6 +4,19 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+// check theme here to avoid "flash" on load
+if (
+  localStorage.getItem('dark-mode') === 'true' || 
+  (!localStorage.getItem('dark-mode') && window.matchMedia('(prefers-color-scheme: dark)').matches)
+) {
+  // Apply dark theme
+  document.documentElement.classList.add('dark');
+} else {
+  // Apply light theme
+  document.documentElement.classList.remove('dark');
+}
+
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
